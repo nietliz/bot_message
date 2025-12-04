@@ -38,49 +38,53 @@ rest.put(
 
 // bot
 client.on('interactionCreate', async (interaction) => {
-    if (!interaction.isChatInputCommand()) return;
-    if (interaction.commandName !== 'enviar') return;
+  if (!interaction.isChatInputCommand()) return;
+  if (interaction.commandName !== 'enviar') return;
   
-    // --- MUDANÇA: Obtendo Nickname e Status de Admin ---
-    // O `interaction.member` só existe se for executado em um servidor (guild)
-    const member = interaction.member; 
+  // --- MUDANÇA: Obtendo Nickname e Status de Admin ---
+  // O `interaction.member` só existe se for executado em um servidor (guild)
+  const member = interaction.member; 
   
-    if (member) {
-      // Obtém o apelido do usuário no servidor (ou nome de usuário se não houver apelido)
-      const nicknameUsuario = member.displayName;
-      // Verifica se o usuário tem a permissão de Administrador (Discord.js v14+)
-      const isAdmin = member.permissions.has('Administrator');
-    
-      // Exemplo de uso: logar ou usar na interação inicial
-      console.log(`Comando /enviar usado por: ${nicknameUsuario}`);
-      console.log(`É Administrador: ${isAdmin}`);
-      // ---------------------------------------------------
+  if (member) {
+    // Obtém o apelido do usuário no servidor (ou nome de usuário se não houver apelido)
+    const nicknameUsuario = member.displayName;
+    // Verifica se o usuário tem a permissão de Administrador (Discord.js v14+)
+    const isAdmin = member.permissions.has('Administrator');
+    // Exemplo de uso: logar ou usar na interação inicial
+    console.log(`Comando /enviar usado por: ${nicknameUsuario}`);
+    console.log(`É Administrador: ${isAdmin}`);
+    // ---------------------------------------------------
   
-      // Adicionando uma verificação de admin, se desejar restringir:
-      // if (!isAdmin) {
-      //   return interaction.reply({ content: 'Você precisa ser Administrador para usar este comando.', ephemeral: true });
-      // }
+    // Adicionando uma verificação de admin, se desejar restringir:
+    // if (!isAdmin) {
+    //   return interaction.reply({ content: 'Você precisa ser Administrador para usar este comando.', ephemeral: true });
+    // }
   
-    } else {
-      // Caso o comando seja usado em DM, interaction.member será null.
-      console.log(`Comando /enviar usado fora de um servidor por: ${interaction.user.tag}`);
-    }
-    
-    const canal = interaction.options.getChannel('canal');
+  } else {
+    // Caso o comando seja usado em DM, interaction.member será null.
+    console.log(`Comando /enviar usado fora de um servidor por: ${interaction.user.tag}`);
+  }
+
   
-    await interaction.reply({
-      // Exemplo de uso do nickname na resposta:
-      content: `Olá, **${member ? member.displayName : interaction.user.username}**! Digite a mensagem para enviar em <#${canal.id}>.`,
-      ephemeral: true
-    });
-  
-    const filtro = (m) => m.author.id === interaction.user.id;
-    const coletor = interaction.channel.createMessageCollector({ filter: filtro, max: 1, time: 60000 });
-  
-    coletor.on('collect', async (msg) => {
-      await canal.send(msg.content);
-      await interaction.followUp({ content: 'Enviado.', ephemeral: true });
-    });
+  if(isAdmin){
+    const canal = interaction.options.getChannel('canal');
+    
+    await interaction.reply({
+      // Exemplo de uso do nickname na resposta:
+      content: `Olá, **${member ? member.displayName : interaction.user.username}**! Digite a mensagem para enviar em <#${canal.id}>.`,
+      ephemeral: true
+    });
+    
+    const filtro = (m) => m.author.id === interaction.user.id;
+    const coletor = interaction.channel.createMessageCollector({ filter: filtro, max: 1, time: 60000 });
+    
+    coletor.on('collect', async (msg) => {
+      await canal.send(msg.content);
+      await interaction.editReply({ content: 'Enviado. (Mensagem enviada com sucesso!)', components: [] });
+    });
+  }else{
+    console.log('Não é administrador');
+  }
   });
 
 client.once('clientReady', () => {
