@@ -59,13 +59,8 @@ client.on('interactionCreate', async (interaction) => {
     // if (!isAdmin) {
     //   return interaction.reply({ content: 'Você precisa ser Administrador para usar este comando.', ephemeral: true });
     // }
-  
-  } else {
-    // Caso o comando seja usado em DM, interaction.member será null.
-    console.log(`Comando /enviar usado fora de um servidor por: ${interaction.user.tag}`);
-  }
 
-  
+
   if(isAdmin){
     const canal = interaction.options.getChannel('canal');
     
@@ -85,7 +80,12 @@ client.on('interactionCreate', async (interaction) => {
   }else{
     console.log('Não é administrador');
   }
-  });
+
+} else {
+  // Caso o comando seja usado em DM, interaction.member será null.
+  console.log(`Comando /enviar usado fora de um servidor por: ${interaction.user.tag}`);
+}
+});
 
 client.once('clientReady', () => {
   console.log('Bot online');
