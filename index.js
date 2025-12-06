@@ -14,7 +14,8 @@ const {
   GatewayIntentBits,
   SlashCommandBuilder,
   Routes,
-  REST
+  REST,
+  MessageFlags
 } = require('discord.js');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
@@ -67,7 +68,7 @@ client.on('interactionCreate', async (interaction) => {
     await interaction.reply({
       // Exemplo de uso do nickname na resposta:
       content: `Olá, **${member ? member.displayName : interaction.user.username}**! Digite a mensagem para enviar em <#${canal.id}>.`,
-      ephemeral: true
+      flags: MessageFlags.Ephemeral
     });
     
     const filtro = (m) => m.author.id === interaction.user.id;
